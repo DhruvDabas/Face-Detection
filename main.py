@@ -1,29 +1,46 @@
-from mtcnn import MTCNN
 import cv2 as cv
+from mtcnn import MTCNN
+import numpy as np
 
+cam = cv.VideoCapture(0)
 detector = MTCNN()
 
-img = cv.imread("/path")
+cam_width = 720
+cam_height = 500
 
-output = detector.detect_faces(img)
-print(output)
+if not cam.isOpened():
+    print("Error")
+    exit()
 
-for i in output:
-    x, y, width, height = i["box"]
-    left_eyeX, left_eyeY = i["keypoints"]["left_eye"]
-    right_eyeX, right_eyeY = i["keypoints"]["right_eye"]
-    noseX, noseY = i["keypoints"]["nose"]
-    mouth_leftX, mouth_leftY = i["keypoints"]["mouth_left"]
-    mouth_rightX, mouth_rightY = i["keypoints"]["mouth_right"]
+cv.namedWindow("Face Recognition App", cv.WINDOW_NORMAL)
+cv.resizeWindow("Face Recognition App", cam_width, cam_height)
 
+while True:
+    ret, frame = cam.read()
 
-    cv.circle(img, (left_eyeX, left_eyeY), 3, (0, 255, 0), -1)
-    cv.circle(img, (right_eyeX, right_eyeY), 3, (0, 255, 0), -1)
-    cv.circle(img, (noseX, noseY), 3, (0, 255, 0), -1)
-    cv.circle(img, (mouth_leftX, mouth_leftY), 3, (0, 255, 0), -1)
-    cv.circle(img, (mouth_rightX, mouth_rightY), 3, (0, 255, 0), -1)
+    output = detector.detect_faces(frame)
 
-    cv.rectangle(img, (x, y), (x + width, y + height), (0, 255, 0), 1)
+    for i in output:
+        x, y, width, height = i["box"]
 
-cv.imshow("window", img)
-cv.waitKey(0)
+        center = (x + width // 2, y + height // 2)
+        radius = max(width, height) // 2
+
+        mask = np.zeros_like(frame)
+        cv.circle(mask, center, radius, (255, 255, 255), -1)
+
+        blurred_frame = cv.GaussianBlur(frame, (99, 99), 30)
+
+        frame = np.where(mask == 255, blurred_frame, frame)
+
+        # cv.circle(frame, center, radius, (0, 255, 0), 2)
+
+    frame = cv.flip(frame, 1)
+    resized_frame = cv.resize(frame, (cam_width, cam_height))
+    cv.imshow("Face Recognition App", resized_frame)
+
+    if cv.waitKey(1) == ord("q"):
+        break
+
+cam.release()
+cv.destroyAllWindows()
