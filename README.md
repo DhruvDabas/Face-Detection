@@ -11,4 +11,3 @@ This project implements a real-time face detection system using Python and OpenC
 - Python 3.6+
 - OpenCV
 - MTCNN
-
