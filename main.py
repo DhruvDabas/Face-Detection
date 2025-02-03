@@ -1,33 +1,42 @@
-import cv2
+import cv2 as cv
+from VideoCapture import VideoCaptureThread
+from FaceDetection import FaceDetectionThread
+from FaceRecognition import FaceRecognitionThread
 
-# all threads
 video_capture = VideoCaptureThread(src=0)
 face_detection = FaceDetectionThread()
 face_recognition = FaceRecognitionThread(known_faces_dir="data/known_faces")
 
 
-# Start threads
 video_capture.start()
 face_detection.start()
 face_recognition.start()
 
+cam_height = 750
+cam_width = 500
+cv.namedWindow("Face Detection App", cv.WINDOW_NORMAL)
+cv.resizeWindow("Face Detection App", cam_width, cam_height)
 
 while True:
-    frame = video_capture.read()
+    frame = video_capture.get_frame()
     if frame is None:
         break
 
-    recognized_faces = face_recognition.get_recognized_faces()
+    faces = face_detection.detect_faces(frame)
 
-    for name, (x, y, w, h) in recognized_faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        cv2.putText(frame, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+    for i in faces:
+        x, y, width, height = i["box"]
+        cv.rectangle(frame, (x, y), (x + width, y + height), (255, 0, 0), 2)
 
-    cv2.imshow("Face Detection and Tracking", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+
+    frame = cv.flip(frame, 1)
+    resized_frame = cv.resize(frame, (cam_width, cam_height))
+    cv.imshow("Face Detection App", resized_frame)
+
+    if cv.waitKey(1) == ord("q"):
         break
 
-video_capture.stop()
+video_capture.release()
 face_detection.stop()
 face_recognition.stop()
-cv2.destroyAllWindows()
+cv.destroyAllWindows()
