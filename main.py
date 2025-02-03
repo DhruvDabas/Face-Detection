@@ -1,10 +1,9 @@
 import cv2 as cv
-from VideoCapture import VideoCaptureThread
-from FaceDetection import FaceDetectionThread
+from FaceDetection import FaceDetection
 from FaceRecognition import FaceRecognitionThread
 
-video_capture = VideoCaptureThread(src=0)
-face_detection = FaceDetectionThread()
+video_capture = cv.VideoCapture(0)
+face_detection = FaceDetection()
 face_recognition = FaceRecognitionThread(known_faces_dir="data/known_faces")
 
 
