@@ -2,9 +2,7 @@ Technologies: Python, OpenCV, MTCNN, Computer Vision
 
 Developed a real-time face detection and tracking system that identifies 
 and tracks human faces in video streams.
-
 Utilized MTCNN for accurate face detection, drawing bounding boxes around detected faces.
-
 Implemented KLT algorithm for real-time tracking, ensuring smooth detection and 
 tracking of moving faces.
 
@@ -19,6 +17,4 @@ Enhancements
 a face recognition model
 database of known faces
 display name of the recognized person
-option to blur or pixelate detected faces for privacy protection
 multi-threading to handle video processing and tracking efficiently
-gui
